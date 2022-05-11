@@ -23,9 +23,6 @@ def trim_words_with_dup_letters(word_list):
             output.append(word)
     return output
 
-def has_duplicates(state):
-    return len(set(state)) < len(state)
-
 def filter_out_overlapping_words(curr_words, words_list):
     output = [x for x in words_list if get_num_letters([x] + curr_words) == WORD_LENGTH * (len(curr_words) + 1)]
     return output
@@ -45,28 +42,36 @@ def trim_words_with_two_vowels(words_list):
     output = [x for x in words_list if get_num_letters([x] + vowels) >= len(x) + 4]
     return output
 
+def score_solution(soln, words_list):
+    tally = 0
+    for x in soln:
+        for w in words_list:
+            for i in range(WORD_LENGTH):
+                if x[i] == w[i]:
+                    tally += 1
+    return tally
+
 def main():
     words = read_dictionary()
     words = [x for x in words if len(x) == WORD_LENGTH]
+    full_dict = words
     words = trim_words_with_dup_letters(words)
-    words = trim_words_with_two_vowels(words)
+    # words = trim_words_with_two_vowels(words)
     words = sorted(words)
 
     print(len(words))
 
     initial_state = [0]
     words_to_guess = [words]
+    curr_state = initial_state
 
     solutions = []
-
-    curr_state = initial_state
     iteration = 0
 
     while curr_state[0] < len(words_to_guess[0]):
         current_depth = len(curr_state)
-        assert current_depth == len(words_to_guess)
-        # print(curr_state, [len(x) for x in words_to_guess])
         current_words = [words_to_guess[i][j] for i, j in enumerate(curr_state)]
+
         if iteration % 5000 == 0:
             print(current_words)
 
@@ -91,11 +96,9 @@ def main():
 
         iteration += 1
 
-    print("Number of groupings tried: ", iteration)
+    print("\n\nNumber of groupings tried: ", iteration)
     for soln in solutions:
-        print(soln)
-
-
+        print(soln, " ", score_solution(soln, full_dict))
 
 if __name__ == "__main__":
     main()
